@@ -3,7 +3,7 @@
 ## Project Structure & Module Organization
 This repository is a flat C codebase for a customized `dwm` v6.8 build.
 - Core sources: `dwm.c` (window manager logic), `drw.c`/`drw.h` (drawing), `util.c`/`util.h` (helpers).
-- Build/config: `Makefile`, `config.mk`, `config.h`, `config.def.h`.
+- Build/config: `Makefile`, `config.mk`, `config.def.h`.
 - Docs/assets: `README`, `dwm.1`, `dwm.png`, `LICENSE`.
 There is no `src/` or `tests/` directory; keep additions at repo root unless a new subsystem justifies structure changes.
 
@@ -33,5 +33,5 @@ There is no automated test framework in this repo. Minimum validation for each c
 - PRs should include: purpose, behavior changes, commands run to validate, and screenshots only when UI/bar/layout output changes.
 
 ## Configuration & Agent Notes
-- `config.h` is the active local configuration. `config.def.h` is the upstream template fallback.
+- `config.def.h` is the single source of truth for configuration (tracked in git). `config.h` is auto-generated from it and gitignored.
 - Review `CLAUDE.md` before substantial changes to align with repository-specific architecture and workflow guidance.

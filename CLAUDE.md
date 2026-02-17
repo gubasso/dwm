@@ -20,10 +20,11 @@ There are no tests or linter. The project compiles with `-std=c99 -pedantic -Wal
 
 dwm uses compile-time configuration — there are no runtime config files.
 
-- `config.def.h` — upstream default configuration template
-- `config.h` — your actual configuration (generated from `config.def.h` on first build, then manually edited)
+- `config.def.h` — your configuration (single source of truth, tracked in git)
+- `config.h` — auto-generated from `config.def.h` by the Makefile, gitignored
 
-**To change configuration:** edit `config.h` directly, then rebuild with `make clean && make`. Do NOT edit `config.def.h` for personal customizations — that file preserves upstream defaults.
+**To change configuration:** edit `config.def.h`, then rebuild with `make clean && make`.
+**To apply patches:** apply directly to `config.def.h`, then rebuild.
 
 This config uses `Mod4` (Super key) as MODKEY, `rofi` as the launcher, and `kitty` as the terminal.
 
