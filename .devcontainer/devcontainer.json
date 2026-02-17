@@ -1,0 +1,70 @@
+{
+  "name": "${localWorkspaceFolderBasename}-sandbox",
+  "image": "devimg/agents:latest",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace/dotfiles,type=bind",
+  "workspaceFolder": "/workspace/dotfiles",
+  "mounts": [
+    // git
+    {
+      "source": "${localEnv:HOME}/.gitconfig",
+      "target": "${localEnv:HOME}/.gitconfig",
+      "type": "bind",
+      "readonly": true
+    },
+    // dotfiles
+    {
+      "source": "${localEnv:DOT}",
+      "target": "${localEnv:DOT}",
+      "type": "bind"
+    },
+    // claude code
+    {
+      "source": "${localEnv:DOT}/claude/.claude",
+      "target": "${localEnv:HOME}/.claude",
+      "type": "bind"
+    },
+    {
+      "source": "${localEnv:HOME}/.claude.json",
+      "target": "${localEnv:HOME}/.claude.json",
+      "type": "bind"
+    },
+    {
+      "source": "${localEnv:DOT}/claude/.local/bin/claude",
+      "target": "${localEnv:HOME}/.local/bin/claude-wrapper",
+      "type": "bind"
+    },
+    // openai codex
+    {
+      "source": "${localEnv:DOT}/codex/.codex",
+      "target": "${localEnv:HOME}/.codex",
+      "type": "bind"
+    },
+    // opencode (auth + sessions / config)
+    {
+      "source": "${localEnv:HOME}/.local/share/opencode",
+      "target": "${localEnv:HOME}/.local/share/opencode",
+      "type": "bind"
+    },
+    {
+      "source": "${localEnv:DOT}/opencode/.config/opencode",
+      "target": "${localEnv:HOME}/.config/opencode",
+      "type": "bind"
+    },
+    // gemini
+    {
+      "source": "${localEnv:DOT}/gemini/.gemini",
+      "target": "${localEnv:HOME}/.gemini",
+      "type": "bind"
+    },
+    // nvim
+    {
+      "source": "${localEnv:DOT}/nvim/.config/nvim",
+      "target": "${localEnv:HOME}/.config/nvim",
+      "type": "bind"
+    }
+  ],
+  "postCreateCommand": {
+    "dotfiles": ".devcontainer/setup-dotfiles ${localEnv:DOT}",
+    "pre-commit": "pre-commit install"
+  }
+}

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Devcontainer dotfiles bootstrap
+# Called by postCreateCommand to deploy dotfiles packages and validate.
+#
+# Usage: setup-dotfiles [DOTFILES_DIR]
+
+DOTFILES="${1:-${DOTFILES:-$HOME/.dotfiles}}"
+
+# Bootstrap bin package (makes dots wrapper available)
+stow -d "$DOTFILES" -vt ~ bin
+
+# Deploy shell + bash packages
+"$HOME/.local/bin/dots" -y --force shell bash
+
+# Claude Code wrapper symlink
+ln -sfn "$HOME/.local/bin/claude-wrapper" "$HOME/.local/bin/claude"
+
+# Validate stow deployment
+if test -L "$HOME/.bashrc" &&
+  test -L "$HOME/.config/bash" &&
+  test -L "$HOME/.profile"; then
+  echo "stow OK"
+else
+  echo "FATAL: dotfiles not deployed" >&2
+  exit 1
+fi
