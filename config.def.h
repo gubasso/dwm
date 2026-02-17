@@ -66,8 +66,12 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
-	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
-	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
+	{ MODKEY,                       XK_Down,   focusstack,     {.i = +1 } },
+	{ MODKEY,                       XK_Up,     focusstack,     {.i = -1 } },
+	{ MODKEY,                       XK_h,      focusdir,       {.i = 0 } },  // left
+	{ MODKEY,                       XK_l,      focusdir,       {.i = 1 } },  // right
+	{ MODKEY,                       XK_k,      focusdir,       {.i = 2 } },  // up
+	{ MODKEY,                       XK_j,      focusdir,       {.i = 3 } },  // down
 	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },
 	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },
 	{ MODKEY|Mod1Mask,              XK_h,      setmfact,       {.f = -0.05} },
