@@ -1,8 +1,8 @@
 {
   "name": "${localWorkspaceFolderBasename}-sandbox",
   "image": "devimg/agents:latest",
-  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace/dotfiles,type=bind",
-  "workspaceFolder": "/workspace/dotfiles",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace/${localWorkspaceFolderBasename},type=bind",
+  "workspaceFolder": "/workspace/${localWorkspaceFolderBasename}",
   "mounts": [
     // git
     {
@@ -60,6 +60,11 @@
     {
       "source": "${localEnv:DOT}/nvim/.config/nvim",
       "target": "${localEnv:HOME}/.config/nvim",
+      "type": "bind"
+    },
+    {
+      "source": "${localEnv:HOME}/Sources/dwm-examples",
+      "target": "${localEnv:HOME}/Sources/dwm-examples",
       "type": "bind"
     }
   ],
