@@ -244,6 +244,7 @@ static void unmanage(Client *c, int destroyed);
 static void unmapnotify(XEvent *e);
 static void updatebarpos(Monitor *m);
 static void updatebars(void);
+static void updatecenterstatus(void);
 static void updateclientlist(void);
 static int updategeom(void);
 static void updatenumlockmask(void);
@@ -269,6 +270,7 @@ static const char broken[] = "broken";
 static const char dwmdir[] = "dwm";
 static const char localshare[] = ".local/share";
 static char stext[256];
+static char cstext[256]; /* center status text */
 static int screen;
 static int sw, sh;           /* X display screen geometry width, height */
 static int bh;               /* bar height */
@@ -292,6 +294,7 @@ static void (*handler[LASTEvent]) (XEvent *) = {
 	[UnmapNotify] = unmapnotify
 };
 static Atom wmatom[WMLast], netatom[NetLast];
+static Atom centeratom;      /* _DWM_CENTER_TEXT atom */
 static int running = 1;
 static Cur *cursor[CurLast];
 static Clr **scheme;
@@ -866,6 +869,17 @@ drawbar(Monitor *m)
 			drw_setscheme(drw, scheme[SchemeNorm]);
 			drw_rect(drw, x, 0, w, bh, 1, 1);
 		}
+	}
+	/* center status -- drawn last, overdraws title fill */
+	if (m == selmon && cstext[0]) {
+		int cw = TEXTW(cstext);
+		int cx = (m->ww - cw) / 2;   /* true pixel center of full bar */
+		if (cx < x)                  /* clamp: don't overlap tags/layout */
+			cx = x;
+		if (cx + cw > m->ww - tw)    /* clamp: don't overlap right status */
+			cx = m->ww - tw - cw;
+		drw_setscheme(drw, scheme[SchemeNorm]);
+		drw_text(drw, cx, 0, cw, bh, lrpad / 2, cstext, 0);
 	}
 	drw_map(drw, m->barwin, 0, 0, m->ww, bh);
 }
@@ -1480,7 +1494,11 @@ propertynotify(XEvent *e)
 	Window trans;
 	XPropertyEvent *ev = &e->xproperty;
 
-	if ((ev->window == root) && (ev->atom == XA_WM_NAME))
+	if (ev->window == root && ev->atom == centeratom) {
+		updatecenterstatus();
+		drawbars();
+		return;
+	} else if ((ev->window == root) && (ev->atom == XA_WM_NAME))
 		updatestatus();
 	else if (ev->state == PropertyDelete)
 		return; /* ignore */
@@ -1945,6 +1963,7 @@ setup(void)
 	netatom[NetWMWindowTypeDialog] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_DIALOG", False);
 	netatom[NetClientList] = XInternAtom(dpy, "_NET_CLIENT_LIST", False);
 	netatom[NetClientInfo] = XInternAtom(dpy, "_NET_CLIENT_INFO", False);
+	centeratom = XInternAtom(dpy, "_DWM_CENTER_TEXT", False);
 	/* init cursors */
 	cursor[CurNormal] = drw_cur_create(drw, XC_left_ptr);
 	cursor[CurResize] = drw_cur_create(drw, XC_sizing);
@@ -1957,6 +1976,7 @@ setup(void)
 	/* init bars */
 	updatebars();
 	updatestatus();
+	updatecenterstatus();
 	/* supporting window for NetWMCheck */
 	wmcheckwin = XCreateSimpleWindow(dpy, root, 0, 0, 1, 1, 0, 0, 0);
 	XChangeProperty(dpy, wmcheckwin, netatom[NetWMCheck], XA_WINDOW, 32,
@@ -2446,6 +2466,24 @@ updatestatus(void)
 	if (!gettextprop(root, XA_WM_NAME, stext, sizeof(stext)))
 		strcpy(stext, "dwm-"VERSION);
 	drawbar(selmon);
+}
+
+void
+updatecenterstatus(void)
+{
+	Atom da;
+	int di;
+	unsigned long dl, nitems;
+	unsigned char *prop = NULL;
+
+	if (XGetWindowProperty(dpy, root, centeratom, 0L, 256, False,
+	    XA_STRING, &da, &di, &nitems, &dl, &prop) == Success && prop) {
+		strncpy(cstext, (char *)prop, sizeof(cstext) - 1);
+		cstext[sizeof(cstext) - 1] = '\0';
+		XFree(prop);
+	} else {
+		cstext[0] = '\0';
+	}
 }
 
 void
