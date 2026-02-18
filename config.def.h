@@ -1,13 +1,13 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static const unsigned int borderpx  = 1;        /* border pixel of windows */
+static const unsigned int borderpx  = 4;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const unsigned int gappih    = 20;       /* horiz inner gap between windows */
-static const unsigned int gappiv    = 10;       /* vert inner gap between windows */
-static const unsigned int gappoh    = 10;       /* horiz outer gap between windows and screen edge */
+static const unsigned int gappiv    = 20;       /* vert inner gap between windows */
+static const unsigned int gappoh    = 20;       /* horiz outer gap between windows and screen edge */
 static const unsigned int gappov    = 30;       /* vert outer gap between windows and screen edge */
-static       int smartgaps          = 0;        /* 1 means no outer gap when there is only one window */
+static       int smartgaps          = 1;        /* 1 means no outer gap when there is only one window */
 static const int showbar            = 0;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
 static const char *fonts[]          = { "monospace:size=10" };
@@ -48,21 +48,21 @@ static const int refreshrate = 120;  /* refresh rate (per second) for client mov
 
 static const Layout layouts[] = {
 	/* symbol     arrange function */
-	{ "[]=",      tile },    /* first entry is default */
-	{ "[M]",      monocle },
-	{ "[@]",      spiral },
-	{ "[\\]",     dwindle },
-	{ "H[]",      deck },
-	{ "TTT",      bstack },
-	{ "===",      bstackhoriz },
-	{ "HHH",      grid },
-	{ "###",      nrowgrid },
-	{ "---",      horizgrid },
-	{ ":::",      gaplessgrid },
-	{ "|M|",      centeredmaster },
-	{ ">M>",      centeredfloatingmaster },
-	{ "><>",      NULL },    /* no layout function means floating behavior */
-	{ NULL,       NULL },
+	{ "[]=",      tile },                    /* [0] default: tile */
+	{ "[M]",      monocle },                 /* [1] monocle */
+	{ "[@]",      spiral },                  /* [2] spiral */
+	{ "[\\]",     dwindle },                 /* [3] dwindle */
+	{ "H[]",      deck },                    /* [4] deck */
+	{ "TTT",      bstack },                  /* [5] bstack */
+	{ "===",      bstackhoriz },             /* [6] bstackhoriz */
+	{ "HHH",      grid },                    /* [7] grid */
+	{ "###",      nrowgrid },                /* [8] nrowgrid */
+	{ "---",      horizgrid },               /* [9] horizgrid */
+	{ ":::",      gaplessgrid },             /* [10] gaplessgrid */
+	{ "|M|",      centeredmaster },          /* [11] centeredmaster */
+	{ ">M>",      centeredfloatingmaster },  /* [12] centeredfloatingmaster */
+	{ "><>",      NULL },                    /* [13] floating */
+	{ NULL,       NULL },                    /* [14] sentinel */
 };
 
 /* key definitions */
@@ -121,6 +121,7 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
 	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[13]} },
 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[1]} },
+	{ MODKEY,                       XK_c,      setlayout,      {.v = &layouts[11]} },
 	{ MODKEY,                       XK_space,  setlayout,      {0} },
 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
 	{ MODKEY,                       XK_equal,  view,           {.ui = ~0 } },
