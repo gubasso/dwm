@@ -46,3 +46,33 @@ Configuration
 -------------
 The configuration of dwm is done by creating a custom config.h
 and (re)compiling the source code.
+
+
+Git Workflow
+------------
+This repository uses master everywhere: local, origin, and upstream.
+
+Remote setup:
+
+    git remote add upstream https://git.suckless.org/dwm
+    git remote set-url origin gh.gubasso:gubasso/dwm.git
+
+Verify remotes:
+
+    git remote -v
+    # origin    gh.gubasso:gubasso/dwm.git (fetch)
+    # origin    gh.gubasso:gubasso/dwm.git (push)
+    # upstream  https://git.suckless.org/dwm (fetch)
+    # upstream  https://git.suckless.org/dwm (push)
+
+Sync and rebase workflow:
+
+    git fetch upstream
+    git checkout master
+    git merge upstream/master
+    git push origin master
+    git checkout rice
+    git rebase master
+    git push origin rice --force-with-lease
+
+No branch-name bridge is needed because all repos use master.
