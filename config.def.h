@@ -48,6 +48,7 @@ static const float mfact     = 0.55; /* factor of master area size [0.05..0.95] 
 static const int nmaster     = 1;    /* number of clients in master area */
 static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
 static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
+static int attachbelow = 1;          /* 1 means attach after the currently active window */
 static const int refreshrate = 120;  /* refresh rate (per second) for client move/resize */
 
 #define FORCE_VSPLIT 1  /* nrowgrid layout: force two clients to always split vertically */
@@ -132,6 +133,7 @@ static Keychord *keychords[] = {
 	&((Keychord){1, {{MODKEY, XK_c}},                            setlayout,      {.v = &layouts[11]} }),
 	&((Keychord){1, {{MODKEY, XK_space}},                        setlayout,      {0} }),
 	&((Keychord){1, {{MODKEY|ShiftMask, XK_space}},              togglefloating, {0} }),
+	&((Keychord){1, {{MODKEY|ShiftMask, XK_a}},                  toggleAttachBelow, {0} }),
 	&((Keychord){1, {{MODKEY, XK_equal}},                        view,           {.ui = ~0 } }),
 	&((Keychord){1, {{MODKEY|ShiftMask, XK_equal}},              tag,            {.ui = ~0 } }),
 	&((Keychord){1, {{MODKEY, XK_comma}},                        focusmon,       {.i = -1 } }),
