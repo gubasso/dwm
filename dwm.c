@@ -281,6 +281,9 @@ static Drw *drw;
 static Monitor *mons, *selmon;
 static Window root, wmcheckwin;
 
+/* vanitygaps declarations (definitions included after struct Pertag below) */
+#include "vanitygaps.h"
+
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 
@@ -293,6 +296,8 @@ struct Pertag {
 	int showbars[LENGTH(tags) + 1]; /* display bar for the current tag */
 	int enablegaps[LENGTH(tags) + 1]; /* pertag gap enablement */
 };
+
+#include "vanitygaps.c"
 
 /* compile-time check if all tags fit into an unsigned int bit array. */
 struct NumTags { char limitexceeded[LENGTH(tags) > 31 ? -1 : 1]; };
