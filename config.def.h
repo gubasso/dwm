@@ -10,7 +10,8 @@ static const unsigned int gappov    = 30;       /* vert outer gap between window
 static       int smartgaps          = 1;        /* 1 means no outer gap when there is only one window */
 static const int showbar            = 0;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
-static const char *fonts[]          = { "monospace:size=10" };
+static const unsigned int statuspad = 20;        /* horizontal padding for right status text */
+static const char *fonts[]          = { "monospace:size=10", "Symbols Nerd Font:pixelsize=30" /* icon fallback; adjust pixelsize for proportion */ };
 static const char dmenufont[]       = "monospace:size=10";
 static unsigned int baralpha        = 0x80;
 static unsigned int borderalpha     = OPAQUE;
@@ -38,7 +39,8 @@ static const Rule rules[] = {
 	{ "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 },
 	{ NULL,       "spterm",   NULL,       SPTAG(0),     1,           -1 },
 	{ NULL,       "spyazi",   NULL,       SPTAG(1),     1,           -1 },
-	{ NULL,       "keepassxc", NULL,       SPTAG(2),     1,           -1 },
+	{ NULL,       "keepassxc", NULL,      SPTAG(2),     1,           -1 },
+	{ NULL,       "nextcloud", NULL,      SPTAG(3),     1,           -1 },
 };
 
 /* window following */
@@ -100,11 +102,13 @@ typedef struct {
 static const char *spcmd1[] = { "kitty", "--name", "spterm", NULL };
 static const char *spcmd2[] = { "kitty", "--name", "spyazi", "yazi", NULL };
 static const char *spcmd3[] = { "keepassxc", NULL };
+static const char *spcmd4[] = { "nextcloud", NULL };
 static Sp scratchpads[] = {
 	/* name        cmd      width height (% of monitor, 0 keeps app default) */
 	{ "spterm",    spcmd1,  80,   0 },
 	{ "spyazi",    spcmd2,  80,   0 },
 	{ "keepassxc", spcmd3,  0,    0 },
+	{ "nextcloud", spcmd4,  70,   70 },
 };
 
 static Keychord *keychords[] = {
@@ -161,6 +165,7 @@ static Keychord *keychords[] = {
 	&((Keychord){1, {{MODKEY, XK_y}},                            togglescratch,  {.ui = 0 } }),
 	&((Keychord){1, {{MODKEY, XK_u}},                            togglescratch,  {.ui = 1 } }),
 	&((Keychord){1, {{MODKEY, XK_x}},                            togglescratch,  {.ui = 2 } }),
+	&((Keychord){1, {{MODKEY, XK_s}},                            togglescratch,  {.ui = 3 } }),
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)

@@ -542,7 +542,7 @@ buttonpress(XEvent *e)
 			click = ClkLtSymbol;
 		else if (ev->x < x + TEXTW(selmon->wfsymbol))
 			click = ClkFollowSymbol;
-		else if (ev->x > selmon->ww - (int)TEXTW(stext) + lrpad - 2)
+		else if (ev->x > selmon->ww - (int)TEXTW(stext) + (int)lrpad - 2 * (int)statuspad)
 			click = ClkStatusText;
 		else
 			click = ClkWinTitle;
@@ -834,8 +834,8 @@ drawbar(Monitor *m)
 	/* draw status first so it can be overdrawn by tags later */
 	if (m == selmon) { /* status is only drawn on selected monitor */
 		drw_setscheme(drw, scheme[SchemeNorm]);
-		tw = TEXTW(stext) - lrpad + 2; /* 2px right padding */
-		drw_text(drw, m->ww - tw, 0, tw, bh, 0, stext, 0);
+		tw = TEXTW(stext) - lrpad + 2 * statuspad;
+		drw_text(drw, m->ww - tw, 0, tw, bh, statuspad, stext, 0);
 	}
 
 	for (c = m->clients; c; c = c->next) {
