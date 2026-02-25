@@ -69,7 +69,7 @@ enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
        NetWMWindowTypeDialog, NetClientList, NetClientInfo, NetLast }; /* EWMH atoms */
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
-       ClkClientWin, ClkRootWin, ClkFollowSymbol, ClkLast }; /* clicks */
+       ClkClientWin, ClkRootWin, ClkLast }; /* clicks */
 
 typedef union {
 	int i;
@@ -540,8 +540,6 @@ buttonpress(XEvent *e)
 			arg.ui = 1 << i;
 		} else if (ev->x < (x = (x + TEXTW(selmon->ltsymbol))))
 			click = ClkLtSymbol;
-		else if (ev->x < x + TEXTW(selmon->wfsymbol))
-			click = ClkFollowSymbol;
 		else if (ev->x > selmon->ww - (int)TEXTW(stext) + (int)lrpad - 2 * (int)statuspad)
 			click = ClkStatusText;
 		else
@@ -856,8 +854,6 @@ drawbar(Monitor *m)
 	w = TEXTW(m->ltsymbol);
 	drw_setscheme(drw, scheme[SchemeNorm]);
 	x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
-	w = TEXTW(m->wfsymbol);
-	x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->wfsymbol, 0);
 
 	if ((w = m->ww - tw - x) > bh) {
 		if (m->sel) {
