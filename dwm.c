@@ -1048,14 +1048,16 @@ drawbar(Monitor *m)
 	}
 	/* center status -- drawn last, overdraws title fill */
 	if (m == selmon && cstext[0]) {
-		int cw = TEXTW(cstext);
+		char csbuf[1030];
+		snprintf(csbuf, sizeof(csbuf), "[ %s ]", cstext);
+		int cw = TEXTW(csbuf);
 		int cx = (m->ww - cw) / 2;   /* true pixel center of full bar */
 		if (cx < x)                  /* clamp: don't overlap tags/layout */
 			cx = x;
 		if (cx + cw > m->ww - tw)    /* clamp: don't overlap right status */
 			cx = m->ww - tw - cw;
 		drw_setscheme(drw, scheme[SchemeNorm]);
-		drw_text(drw, cx, 0, cw, bh, lrpad / 2, cstext, 0);
+		drw_text(drw, cx, 0, cw, bh, lrpad / 2, csbuf, 0);
 	}
 	drw_map(drw, m->barwin, 0, 0, m->ww, bh);
 }
