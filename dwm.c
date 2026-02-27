@@ -202,6 +202,7 @@ static void detachstack(Client *c);
 static Monitor *dirtomon(int dir);
 static void drawbar(Monitor *m);
 static void drawbars(void);
+static int drawstatusbar(Monitor *m, int bh, char *stext);
 static void enternotify(XEvent *e);
 static void expose(XEvent *e);
 static void focus(Client *c);
@@ -292,8 +293,9 @@ static const char autostartsh[] = "autostart.sh";
 static const char broken[] = "broken";
 static const char dwmdir[] = "dwm";
 static const char localshare[] = ".local/share";
-static char stext[256];
-static char cstext[256]; /* center status text */
+static char stext[1024];
+static char cstext[1024]; /* center status text */
+static int statusbarx;    /* x where right status begins, set by drawstatusbar */
 static int screen;
 static int sw, sh;           /* X display screen geometry width, height */
 static int bh;               /* bar height */
@@ -563,7 +565,7 @@ buttonpress(XEvent *e)
 			arg.ui = 1 << i;
 		} else if (ev->x < (x = (x + TEXTW(selmon->ltsymbol))))
 			click = ClkLtSymbol;
-		else if (ev->x > selmon->ww - (int)TEXTW(stext) + (int)lrpad - 2 * (int)statuspad)
+		else if (ev->x > statusbarx)
 			click = ClkStatusText;
 		else
 			click = ClkWinTitle;
@@ -608,7 +610,7 @@ cleanup(void)
 		cleanupmon(mons);
 	for (i = 0; i < CurLast; i++)
 		drw_cur_free(drw, cursor[i]);
-	for (i = 0; i < LENGTH(colors); i++)
+	for (i = 0; i < LENGTH(colors) + 1; i++)
 		drw_scm_free(drw, scheme[i], 3);
 	free(scheme);
 	XDestroyWindow(dpy, wmcheckwin);
@@ -840,6 +842,163 @@ dirtomon(int dir)
 	return m;
 }
 
+static int
+drawstatusbar(Monitor *m, int bh, char *stext)
+{
+	char buf[1024], *text;
+	int i, len, ret, w, x;
+	short iscode = 0;
+
+	len = strlen(stext) + 1;
+	memcpy(buf, stext, len);
+	text = buf;
+
+	/* compute width without drawing */
+	w = 0;
+	i = -1;
+	while (text[++i]) {
+		if (text[i] == '^') {
+			if (!iscode) {
+				iscode = 1;
+				text[i] = '\0';
+				w += TEXTW(text) - lrpad;
+				text[i] = '^';
+				if (text[++i] == 'f')
+					w += atoi(text + ++i);
+			} else {
+				iscode = 0;
+				text = text + i + 1;
+				i = -1;
+			}
+		}
+	}
+	if (!iscode)
+		w += TEXTW(text) - lrpad;
+	else
+		iscode = 0;
+	text = buf;
+
+	w += 2 * statuspad;
+	ret = m->ww - w;
+	x = ret;
+
+	drw_setscheme(drw, scheme[LENGTH(colors)]);
+	drw->scheme[ColFg] = scheme[SchemeNorm][ColFg];
+	drw->scheme[ColBg] = scheme[SchemeNorm][ColBg];
+	drw_rect(drw, x, 0, w, bh, 1, 1);
+	x += statuspad;
+
+	/* process status text */
+	i = -1;
+	while (text[++i]) {
+		if (text[i] == '^' && !iscode) {
+			iscode = 1;
+			text[i] = '\0';
+			w = TEXTW(text) - lrpad;
+			drw_text(drw, x, 0, w, bh, 0, text, 0);
+			x += w;
+
+			while (text[++i] && text[i] != '^') {
+				if (text[i] == 'c') {
+					char hex[8];
+					if (strlen(text + i + 1) < 7)
+						continue;
+					memcpy(hex, text + i + 1, 7);
+					hex[7] = '\0';
+					drw_clr_create(drw, &drw->scheme[ColFg], hex, baralpha);
+					i += 7;
+				} else if (text[i] == 'b') {
+					char hex[8];
+					if (strlen(text + i + 1) < 7)
+						continue;
+					memcpy(hex, text + i + 1, 7);
+					hex[7] = '\0';
+					drw_clr_create(drw, &drw->scheme[ColBg], hex, baralpha);
+					i += 7;
+				} else if (text[i] == 'C') {
+					char *end;
+					long c;
+					if (text[i + 1] < '0' || text[i + 1] > '9')
+						continue;
+					errno = 0;
+					c = strtol(text + i + 1, &end, 10);
+					if (end == text + i + 1 || errno == ERANGE)
+						continue;
+					if (c < 0)
+						c = 0;
+					if (c > 15)
+						c = 15;
+					drw_clr_create(drw, &drw->scheme[ColFg], termcolor[c], baralpha);
+					i += (int)(end - (text + i + 1));
+				} else if (text[i] == 'B') {
+					char *end;
+					long c;
+					if (text[i + 1] < '0' || text[i + 1] > '9')
+						continue;
+					errno = 0;
+					c = strtol(text + i + 1, &end, 10);
+					if (end == text + i + 1 || errno == ERANGE)
+						continue;
+					if (c < 0)
+						c = 0;
+					if (c > 15)
+						c = 15;
+					drw_clr_create(drw, &drw->scheme[ColBg], termcolor[c], baralpha);
+					i += (int)(end - (text + i + 1));
+				} else if (text[i] == 'd') {
+					drw->scheme[ColFg] = scheme[SchemeNorm][ColFg];
+					drw->scheme[ColBg] = scheme[SchemeNorm][ColBg];
+				} else if (text[i] == 'r') {
+					int rx, ry, rw, rh;
+
+					if (!text[++i])
+						break;
+					rx = atoi(text + i);
+					while (text[i] && text[i] != ',' && text[i] != '^')
+						i++;
+					if (!text[i] || text[i] == '^')
+						break;
+					if (!text[++i])
+						break;
+					ry = atoi(text + i);
+					while (text[i] && text[i] != ',' && text[i] != '^')
+						i++;
+					if (!text[i] || text[i] == '^')
+						break;
+					if (!text[++i])
+						break;
+					rw = atoi(text + i);
+					while (text[i] && text[i] != ',' && text[i] != '^')
+						i++;
+					if (!text[i] || text[i] == '^')
+						break;
+					if (!text[++i])
+						break;
+					rh = atoi(text + i);
+					drw_rect(drw, x + rx, ry, rw, rh, 1, 0);
+				} else if (text[i] == 'f') {
+					x += atoi(text + ++i);
+				}
+			}
+
+			if (!text[i])
+				break;
+			text = text + i + 1;
+			i = -1;
+			iscode = 0;
+		}
+	}
+
+	if (!iscode) {
+		w = TEXTW(text) - lrpad;
+		drw_text(drw, x, 0, w, bh, 0, text, 0);
+	}
+
+	drw_setscheme(drw, scheme[SchemeNorm]);
+	statusbarx = ret;
+	return ret;
+}
+
 void
 drawbar(Monitor *m)
 {
@@ -854,9 +1013,7 @@ drawbar(Monitor *m)
 
 	/* draw status first so it can be overdrawn by tags later */
 	if (m == selmon) { /* status is only drawn on selected monitor */
-		drw_setscheme(drw, scheme[SchemeNorm]);
-		tw = TEXTW(stext) - lrpad + 2 * statuspad;
-		drw_text(drw, m->ww - tw, 0, tw, bh, statuspad, stext, 0);
+		tw = m->ww - drawstatusbar(m, bh, stext);
 	}
 
 	for (c = m->clients; c; c = c->next) {
@@ -1309,6 +1466,22 @@ loadxrdb(void)
 	XRDB_LOAD_COLOR("dwm.selbordercolor", selbordercolor);
 	XRDB_LOAD_COLOR("dwm.selbgcolor", selbgcolor);
 	XRDB_LOAD_COLOR("dwm.selfgcolor", selfgcolor);
+	XRDB_LOAD_COLOR("color0", termcol0);
+	XRDB_LOAD_COLOR("color1", termcol1);
+	XRDB_LOAD_COLOR("color2", termcol2);
+	XRDB_LOAD_COLOR("color3", termcol3);
+	XRDB_LOAD_COLOR("color4", termcol4);
+	XRDB_LOAD_COLOR("color5", termcol5);
+	XRDB_LOAD_COLOR("color6", termcol6);
+	XRDB_LOAD_COLOR("color7", termcol7);
+	XRDB_LOAD_COLOR("color8", termcol8);
+	XRDB_LOAD_COLOR("color9", termcol9);
+	XRDB_LOAD_COLOR("color10", termcol10);
+	XRDB_LOAD_COLOR("color11", termcol11);
+	XRDB_LOAD_COLOR("color12", termcol12);
+	XRDB_LOAD_COLOR("color13", termcol13);
+	XRDB_LOAD_COLOR("color14", termcol14);
+	XRDB_LOAD_COLOR("color15", termcol15);
 
 	XrmDestroyDatabase(xrdb);
 }
@@ -2011,10 +2184,11 @@ setup(void)
 	cursor[CurResize] = drw_cur_create(drw, XC_sizing);
 	cursor[CurMove] = drw_cur_create(drw, XC_fleur);
 	/* init appearance */
-	scheme = ecalloc(LENGTH(colors), sizeof(Clr *));
+	scheme = ecalloc(LENGTH(colors) + 1, sizeof(Clr *));
 	unsigned int alphas[] = { borderalpha, baralpha, OPAQUE };
 	for (i = 0; i < LENGTH(colors); i++)
 		scheme[i] = drw_scm_create(drw, colors[i], alphas, 3);
+	scheme[LENGTH(colors)] = drw_scm_create(drw, colors[SchemeNorm], alphas, 3);
 	/* init bars */
 	updatebars();
 	updatestatus();
@@ -2705,6 +2879,8 @@ xrdb(const Arg *arg)
 		drw_scm_free(drw, scheme[i], 3);
 		scheme[i] = drw_scm_create(drw, colors[i], alphas, 3);
 	}
+	drw_scm_free(drw, scheme[LENGTH(colors)], 3);
+	scheme[LENGTH(colors)] = drw_scm_create(drw, colors[SchemeNorm], alphas, 3);
 	focus(NULL);
 	arrange(NULL);
 }

@@ -21,6 +21,28 @@ static char normfgcolor[]           = "#bbbbbb";
 static char selfgcolor[]            = "#eeeeee";
 static char selbgcolor[]            = "#005577";
 static char selbordercolor[]        = "#005577";
+static char termcol0[]              = "#000000";
+static char termcol1[]              = "#ff0000";
+static char termcol2[]              = "#33ff00";
+static char termcol3[]              = "#ff0099";
+static char termcol4[]              = "#0066ff";
+static char termcol5[]              = "#cc00ff";
+static char termcol6[]              = "#00ffff";
+static char termcol7[]              = "#d0d0d0";
+static char termcol8[]              = "#808080";
+static char termcol9[]              = "#ff0000";
+static char termcol10[]             = "#33ff00";
+static char termcol11[]             = "#ff0099";
+static char termcol12[]             = "#0066ff";
+static char termcol13[]             = "#cc00ff";
+static char termcol14[]             = "#00ffff";
+static char termcol15[]             = "#ffffff";
+static char *termcolor[]            = {
+	termcol0, termcol1, termcol2, termcol3,
+	termcol4, termcol5, termcol6, termcol7,
+	termcol8, termcol9, termcol10, termcol11,
+	termcol12, termcol13, termcol14, termcol15,
+};
 static char *colors[][3]            = {
 	/*               fg           bg           border   */
 	[SchemeNorm] = { normfgcolor, normbgcolor, normbordercolor },
