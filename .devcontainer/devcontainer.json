@@ -33,6 +33,13 @@
       "target": "${localEnv:HOME}/.local/bin/claude-wrapper",
       "type": "bind"
     },
+    // gcloud ADC (vertex auth — directory mount, safe on all hosts)
+    {
+      "source": "${localEnv:HOME}/.config/gcloud",
+      "target": "${localEnv:HOME}/.config/gcloud",
+      "type": "bind",
+      "readonly": true
+    },
     // openai codex
     {
       "source": "${localEnv:DOT}/codex/.codex",
@@ -60,11 +67,6 @@
     {
       "source": "${localEnv:DOT}/nvim/.config/nvim",
       "target": "${localEnv:HOME}/.config/nvim",
-      "type": "bind"
-    },
-    {
-      "source": "${localEnv:HOME}/Sources/dwm-examples",
-      "target": "${localEnv:HOME}/Sources/dwm-examples",
       "type": "bind"
     }
   ],

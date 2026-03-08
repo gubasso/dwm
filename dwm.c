@@ -2193,8 +2193,8 @@ setup(void)
 	scheme[LENGTH(colors)] = drw_scm_create(drw, colors[SchemeNorm], alphas, 3);
 	/* init bars */
 	updatebars();
-	updatestatus();
 	updatecenterstatus();
+	updatestatus();
 	/* supporting window for NetWMCheck */
 	wmcheckwin = XCreateSimpleWindow(dpy, root, 0, 0, 1, 1, 0, 0, 0);
 	XChangeProperty(dpy, wmcheckwin, netatom[NetWMCheck], XA_WINDOW, 32,
@@ -2681,8 +2681,7 @@ updatesizehints(Client *c)
 void
 updatestatus(void)
 {
-	if (!gettextprop(root, XA_WM_NAME, stext, sizeof(stext)))
-		strcpy(stext, "dwm-"VERSION);
+	gettextprop(root, XA_WM_NAME, stext, sizeof(stext));
 	drawbar(selmon);
 }
 
