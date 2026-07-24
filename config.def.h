@@ -21,6 +21,9 @@ static char normfgcolor[]           = "#CBB7E6";
 static char selfgcolor[]            = "#DC4ADF";
 static char selbgcolor[]            = "#000000";
 static char selbordercolor[]        = "#E040F3";
+static char urgfgcolor[]            = "#000000";
+static char urgbgcolor[]            = "#FF3B5C";
+static char urgbordercolor[]        = "#FF3B5C";
 static char termcol0[]              = "#030009";
 static char termcol1[]              = "#FF3B5C";
 static char termcol2[]              = "#2DFF8F";
@@ -47,6 +50,7 @@ static char *colors[][3]            = {
 	/*               fg           bg           border   */
 	[SchemeNorm] = { normfgcolor, normbgcolor, normbordercolor },
 	[SchemeSel]  = { selfgcolor,  selbgcolor,  selbordercolor  },
+	[SchemeUrg]  = { urgfgcolor,  urgbgcolor,  urgbordercolor  },
 };
 
 /* tagging */

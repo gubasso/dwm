@@ -84,7 +84,7 @@
 
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
-enum { SchemeNorm, SchemeSel }; /* color schemes */
+enum { SchemeNorm, SchemeSel, SchemeUrg }; /* color schemes */
 enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
        NetWMFullscreen, NetActiveWindow, NetWMWindowType,
        NetWMWindowTypeDialog, NetClientList, NetClientInfo, NetLast }; /* EWMH atoms */
@@ -1468,6 +1468,9 @@ loadxrdb(void)
 	XRDB_LOAD_COLOR("dwm.selbordercolor", selbordercolor);
 	XRDB_LOAD_COLOR("dwm.selbgcolor", selbgcolor);
 	XRDB_LOAD_COLOR("dwm.selfgcolor", selfgcolor);
+	XRDB_LOAD_COLOR("dwm.urgbordercolor", urgbordercolor);
+	XRDB_LOAD_COLOR("dwm.urgbgcolor", urgbgcolor);
+	XRDB_LOAD_COLOR("dwm.urgfgcolor", urgfgcolor);
 	XRDB_LOAD_COLOR("color0", termcol0);
 	XRDB_LOAD_COLOR("color1", termcol1);
 	XRDB_LOAD_COLOR("color2", termcol2);
@@ -2225,6 +2228,8 @@ seturgent(Client *c, int urg)
 	XWMHints *wmh;
 
 	c->isurgent = urg;
+	if (urg && c != selmon->sel)
+		XSetWindowBorder(dpy, c->win, scheme[SchemeUrg][ColBorder].pixel);
 	if (!(wmh = XGetWMHints(dpy, c->win)))
 		return;
 	wmh->flags = urg ? (wmh->flags | XUrgencyHint) : (wmh->flags & ~XUrgencyHint);
@@ -2439,7 +2444,7 @@ unfocus(Client *c, int setfocus)
 	if (!c)
 		return;
 	grabbuttons(c, 0);
-	XSetWindowBorder(dpy, c->win, scheme[SchemeNorm][ColBorder].pixel);
+	XSetWindowBorder(dpy, c->win, scheme[c->isurgent ? SchemeUrg : SchemeNorm][ColBorder].pixel);
 	if (setfocus) {
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
 		XDeleteProperty(dpy, root, netatom[NetActiveWindow]);
