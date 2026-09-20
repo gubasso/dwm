@@ -2363,26 +2363,48 @@ togglefloating(const Arg *arg)
 void
 togglescratch(const Arg *arg)
 {
-	Client *c;
-	unsigned int found = 0;
+	Client *c = NULL;
+	Monitor *m;
 	unsigned int scratchtag = SPTAG(arg->ui);
 	Arg sparg = { .v = scratchpads[arg->ui].cmd };
 
-	for (c = selmon->clients; c && !(found = c->tags & scratchtag); c = c->next);
-	if (found) {
-		unsigned int newtagset = selmon->tagset[selmon->seltags] ^ scratchtag;
-		if (newtagset) {
-			selmon->tagset[selmon->seltags] = newtagset;
-			focus(NULL);
-			arrange(selmon);
-		}
-		if (ISVISIBLE(c)) {
-			focus(c);
-			restack(selmon);
-		}
-	} else {
+	/* a pad is one client on any monitor, not one client on this monitor */
+	for (m = mons; m && !c; m = m->next)
+		for (c = m->clients; c && !(c->tags & scratchtag); c = c->next);
+
+	if (!c) {
 		selmon->tagset[selmon->seltags] |= scratchtag;
 		spawn(&sparg);
+		return;
+	}
+
+	if (c->mon != selmon) {
+		/* pull the pad here, keeping its scratch tag, and show it.
+		 * showhide() re-centers and re-sizes it against the new monitor. */
+		c->mon->tagset[c->mon->seltags] &= ~scratchtag;
+		unfocus(c, 1);
+		detach(c);
+		detachstack(c);
+		c->mon = selmon;
+		if (attachbelow)
+			attachBelow(c);
+		else
+			attach(c);
+		attachstack(c);
+		if (c->isfullscreen)
+			resizeclient(c, selmon->mx, selmon->my, selmon->mw, selmon->mh);
+		setclienttagprop(c);
+		selmon->tagset[selmon->seltags] |= scratchtag;
+	} else {
+		unsigned int newtagset = selmon->tagset[selmon->seltags] ^ scratchtag;
+		if (newtagset)
+			selmon->tagset[selmon->seltags] = newtagset;
+	}
+	focus(NULL);
+	arrange(NULL);
+	if (ISVISIBLE(c)) {
+		focus(c);
+		restack(selmon);
 	}
 }
 
