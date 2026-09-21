@@ -68,6 +68,7 @@ static const Rule rules[] = {
 	{ NULL,       "spyazi",   NULL,       SPTAG(1),     1,           -1 },
 	{ NULL,       "keepassxc", NULL,      SPTAG(2),     1,           -1 },
 	{ NULL,       "nextcloud", NULL,      SPTAG(3),     1,           -1 },
+	{ NULL,       "spwiremix", NULL,      SPTAG(4),     1,           -1 },
 };
 
 /* window following */
@@ -130,12 +131,14 @@ static const char *spcmd1[] = { "kitty", "--name", "spterm", NULL };
 static const char *spcmd2[] = { "kitty", "--name", "spyazi", "yazi", NULL };
 static const char *spcmd3[] = { "keepassxc", NULL };
 static const char *spcmd4[] = { "nextcloud", NULL };
+static const char *spcmd5[] = { "kitty", "--name", "spwiremix", "-e", "wiremix", NULL };
 static Sp scratchpads[] = {
 	/* name        cmd      width height (% of monitor, 0 keeps app default) */
 	{ "spterm",    spcmd1,  80,   0 },
 	{ "spyazi",    spcmd2,  80,   0 },
 	{ "keepassxc", spcmd3,  0,    0 },
 	{ "nextcloud", spcmd4,  70,   70 },
+	{ "spwiremix", spcmd5,  80,   0 },
 };
 
 static Keychord *keychords[] = {
@@ -191,6 +194,7 @@ static Keychord *keychords[] = {
 	&((Keychord){1, {{MODKEY, XK_u}},                            togglescratch,  {.ui = 1 } }),
 	&((Keychord){1, {{MODKEY, XK_x}},                            togglescratch,  {.ui = 2 } }),
 	&((Keychord){1, {{MODKEY, XK_s}},                            togglescratch,  {.ui = 3 } }),
+	&((Keychord){1, {{MODKEY, XK_v}},                            togglescratch,  {.ui = 4 } }),
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)
