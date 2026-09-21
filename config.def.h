@@ -11,7 +11,7 @@ static       int smartgaps          = 1;        /* 1 means no outer gap when the
 static const int showbar            = 0;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
 static const unsigned int statuspad = 20;        /* horizontal padding for right status text */
-static const char *fonts[]          = { "monospace:size=10", "Symbols Nerd Font:pixelsize=30" /* icon fallback; adjust pixelsize for proportion */ };
+static const char *fonts[]          = { "monospace:size=14", "Symbols Nerd Font:size=14" /* fallback for codepoints the bar font lacks; drw picks the first font that has the glyph */ };
 static const char dmenufont[]       = "monospace:size=10";
 static unsigned int baralpha        = 0x80;
 static unsigned int borderalpha     = OPAQUE;
