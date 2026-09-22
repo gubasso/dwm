@@ -1003,6 +1003,8 @@ void
 drawbar(Monitor *m)
 {
 	int x, w, tw = 0;
+	int cw = 0, cx = 0, titlew;
+	char csbuf[1030];
 	int boxs = drw->fonts->h / 9;
 	int boxw = drw->fonts->h / 6 + 2;
 	unsigned int i, occ = 0, urg = 0;
@@ -1035,27 +1037,48 @@ drawbar(Monitor *m)
 	drw_setscheme(drw, scheme[SchemeNorm]);
 	x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
 
+	/* Center status box, measured BEFORE the title is drawn. It used to be
+	 * measured after and painted over the title's middle, so a title longer
+	 * than the gap ran underneath the clock and reappeared on its far side.
+	 * Knowing the box here is what lets the title stop at its left edge. */
+	if (m == selmon && cstext[0]) {
+		snprintf(csbuf, sizeof(csbuf), "[ %s ]", cstext);
+		cw = TEXTW(csbuf);
+		/* A bar too narrow to hold the clock between its neighbours: give it
+		 * what is left and let drw_text ellipsize the clock itself. */
+		if (cw > m->ww - tw - x)
+			cw = MAX(0, m->ww - tw - x);
+		cx = (m->ww - cw) / 2;       /* true pixel center of full bar */
+		if (cx < x)                  /* clamp: don't overlap tags/layout */
+			cx = x;
+		if (cx + cw > m->ww - tw)    /* clamp: don't overlap right status */
+			cx = m->ww - tw - cw;
+	}
+
 	if ((w = m->ww - tw - x) > bh) {
 		if (m->sel) {
+			/* Paint the whole free span first. The title no longer covers all
+			 * of it, and the strip right of the clock would otherwise keep
+			 * whatever the previous draw left there. The scheme is the one the
+			 * full-width title used, so the bar looks as it did before. */
 			drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
-			drw_text(drw, x, 0, w, bh, lrpad / 2, m->sel->name, 0);
-			if (m->sel->isfloating)
+			drw_rect(drw, x, 0, w, bh, 1, 1);
+			/* Stop the text at the clock's left edge. drw_text emits "..."
+			 * by itself when the text overflows the width it is handed, so no
+			 * truncation of our own is needed. A monitor that is not selected
+			 * draws no clock and keeps the full width. */
+			titlew = cw ? MIN(w, MAX(0, cx - x)) : w;
+			drw_text(drw, x, 0, titlew, bh, lrpad / 2, m->sel->name, 0);
+			/* Only when the indicator fits inside the bounded title. */
+			if (m->sel->isfloating && titlew >= boxs + boxw)
 				drw_rect(drw, x + boxs, boxs, boxw, boxw, m->sel->isfixed, 0);
 		} else {
 			drw_setscheme(drw, scheme[SchemeNorm]);
 			drw_rect(drw, x, 0, w, bh, 1, 1);
 		}
 	}
-	/* center status -- drawn last, overdraws title fill */
-	if (m == selmon && cstext[0]) {
-		char csbuf[1030];
-		snprintf(csbuf, sizeof(csbuf), "[ %s ]", cstext);
-		int cw = TEXTW(csbuf);
-		int cx = (m->ww - cw) / 2;   /* true pixel center of full bar */
-		if (cx < x)                  /* clamp: don't overlap tags/layout */
-			cx = x;
-		if (cx + cw > m->ww - tw)    /* clamp: don't overlap right status */
-			cx = m->ww - tw - cw;
+	/* center status -- drawn last, over the span the title prefilled */
+	if (cw) {
 		drw_setscheme(drw, scheme[SchemeNorm]);
 		drw_text(drw, cx, 0, cw, bh, lrpad / 2, csbuf, 0);
 	}
