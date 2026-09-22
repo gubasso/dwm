@@ -56,9 +56,10 @@
 #define WIDTH(X)                ((X)->w + 2 * (X)->bw)
 #define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
 #define NUMTAGS                 (LENGTH(tags) + LENGTH(scratchpads))
-#define TAGMASK                 ((1 << NUMTAGS) - 1)
+#define TAGMASK                 ((1 << LENGTH(tags)) - 1)
 #define SPTAG(i)                ((1 << LENGTH(tags)) << (i))
 #define SPTAGMASK               (((1 << LENGTH(scratchpads)) - 1) << LENGTH(tags))
+#define ALLTAGMASK              (TAGMASK | SPTAGMASK)
 #define TEXTW(X)                (drw_fontset_getwidth(drw, (X)) + lrpad)
 #define OPAQUE                  0xffU
 #define XRDB_LOAD_COLOR(R, V) \
@@ -414,7 +415,7 @@ applyrules(Client *c)
 		XFree(ch.res_class);
 	if (ch.res_name)
 		XFree(ch.res_name);
-	c->tags = c->tags & TAGMASK ? c->tags & TAGMASK : (c->mon->tagset[c->mon->seltags] & ~SPTAGMASK);
+	c->tags = c->tags & ALLTAGMASK ? c->tags & ALLTAGMASK : (c->mon->tagset[c->mon->seltags] & TAGMASK);
 }
 
 int
@@ -2020,13 +2021,29 @@ scan(void)
 void
 sendmon(Client *c, Monitor *m)
 {
+	unsigned int scratchtags;
+
 	if (c->mon == m)
 		return;
+	/* a scratchpad is identified by its tag alone, so the plain
+	 * "assign tags of target monitor" would destroy the pad. Carry the
+	 * scratch tag over and move its view bit to the target instead. */
+	scratchtags = c->tags & SPTAGMASK;
+	if (scratchtags)
+		c->mon->tagset[c->mon->seltags] &= ~scratchtags;
 	unfocus(c, 1);
 	detach(c);
 	detachstack(c);
 	c->mon = m;
-	c->tags = m->tagset[m->seltags]; /* assign tags of target monitor */
+	if (scratchtags) {
+		m->tagset[m->seltags] |= scratchtags;
+	} else {
+		/* an ordinary window never inherits a scratch tag it would
+		 * pick up from a pad the target monitor happens to show */
+		c->tags = m->tagset[m->seltags] & TAGMASK;
+		if (!c->tags)
+			c->tags = 1; /* never leave a client on no tag at all */
+	}
 	if (attachbelow)
 		attachBelow(c);
 	else
@@ -2326,6 +2343,10 @@ void
 tag(const Arg *arg)
 {
 	Client *c;
+	/* tagging a scratchpad would drop the tag that identifies it, which
+	 * leaves a single-instance pad such as keepassxc unreachable */
+	if (selmon->sel && (selmon->sel->tags & SPTAGMASK))
+		return;
 	if (selmon->sel && arg->ui & TAGMASK) {
 		c = selmon->sel;
 		selmon->sel->tags = arg->ui & TAGMASK;
@@ -2436,7 +2457,7 @@ toggletag(const Arg *arg)
 {
 	unsigned int newtags;
 
-	if (!selmon->sel)
+	if (!selmon->sel || (selmon->sel->tags & SPTAGMASK))
 		return;
 	newtags = selmon->sel->tags ^ (arg->ui & TAGMASK);
 	if (newtags) {
@@ -2451,20 +2472,22 @@ void
 toggleview(const Arg *arg)
 {
 	unsigned int newtagset = selmon->tagset[selmon->seltags] ^ (arg->ui & TAGMASK);
+	unsigned int regulartags = newtagset & TAGMASK;
 	int i;
 
-	if (newtagset) {
+	/* A monitor view must always retain a regular tag. Scratch tags are an
+	 * overlay and have no Pertag entry of their own. */
+	if (regulartags) {
 		selmon->tagset[selmon->seltags] = newtagset;
 
-		if (newtagset == ~0) {
+		if (regulartags == TAGMASK) {
 			selmon->pertag->prevtag = selmon->pertag->curtag;
 			selmon->pertag->curtag = 0;
-		}
-
-		/* test if the user did not select the same tag */
-		if (!(newtagset & 1 << (selmon->pertag->curtag - 1))) {
+		} else if (selmon->pertag->curtag == 0
+		|| !(regulartags & 1 << (selmon->pertag->curtag - 1))) {
+			/* test if the user did not select the same regular tag */
 			selmon->pertag->prevtag = selmon->pertag->curtag;
-			for (i = 0; !(newtagset & 1 << i); i++) ;
+			for (i = 0; !(regulartags & 1 << i); i++) ;
 			selmon->pertag->curtag = i + 1;
 		}
 
