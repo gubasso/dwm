@@ -67,7 +67,13 @@ static const Rule rules[] = {
 	{ NULL,       "spterm",   NULL,       SPTAG(0),     1,           -1 },
 	{ NULL,       "spyazi",   NULL,       SPTAG(1),     1,           -1 },
 	{ NULL,       "keepassxc", NULL,      SPTAG(2),     1,           -1 },
-	{ NULL,       "nextcloud", NULL,      SPTAG(3),     1,           -1 },
+	/* Nextcloud 34 opens Activities, Search and the rest as their own windows.
+	 * Only Settings, the window the client itself opens when no tray exists,
+	 * is the pad; the rest float on the current tag. applyrules() ORs the tags
+	 * of every match and takes isfloating from the last, so Settings gets both.
+	 * The title is the client's translated "%1 Settings", English here. */
+	{ NULL,       "nextcloud", NULL,                 0,           1,           -1 },
+	{ NULL,       "nextcloud", "Nextcloud Settings", SPTAG(3),    1,           -1 },
 	{ NULL,       "spwiremix", NULL,      SPTAG(4),     1,           -1 },
 };
 
