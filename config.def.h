@@ -13,7 +13,7 @@ static const int topbar             = 1;        /* 0 means bottom bar */
 static const unsigned int statuspad = 20;        /* horizontal padding for right status text */
 static const char *fonts[]          = { "monospace:size=14", "Symbols Nerd Font:size=14" /* fallback for codepoints the bar font lacks; drw picks the first font that has the glyph */ };
 static const char dmenufont[]       = "monospace:size=10";
-static unsigned int baralpha        = 0x80;
+static unsigned int baralpha        = 0xe6;        /* bar background opacity: 0xe6 is about 90%, dark enough to read over a bright wallpaper */
 static unsigned int borderalpha     = OPAQUE;
 static char normbgcolor[]           = "#000000";
 static char normbordercolor[]       = "#2D084C";
