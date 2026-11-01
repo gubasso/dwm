@@ -25,6 +25,9 @@
         devShells.default = pkgs.mkShell {
           packages = [
             pkgs.pre-commit
+            # rustup needs curl when pre-commit sets up the environment of
+            # the ripsecrets hook. pre-commit installs rust itself.
+            pkgs.curl
             pkgs.gnumake
             pkgs.pkg-config
             pkgs.libx11
