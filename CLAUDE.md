@@ -23,7 +23,7 @@ nix develop --command pre-commit run --all-files                         # pre-c
 nix develop --command pre-commit run --all-files --hook-stage pre-push   # adds gitleaks and make-build
 ```
 
-`build_install.sh` builds on the host and installs with `sudo make install`, because it installs the window manager of the host. `config.mk` takes the include and library flags from `pkg-config`, and falls back to fixed host paths when `pkg-config` does not find the libraries.
+dwm has two install paths, described in "Install" of `README.md`. On the operator's hosts, nix-secrets builds the pinned `rice` through Home Manager. On another host, `build_install.sh` builds with `/usr/bin/cc` and installs with `sudo make install`. `config.mk` takes the include and library flags from `pkg-config`, and falls back to fixed host paths when `pkg-config` does not find the libraries.
 
 ## Configuration Workflow
 

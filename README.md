@@ -1,5 +1,42 @@
 # dwm Custom Notes
 
+## Branches
+
+- `rice` is the main branch of this fork. It carries the patches and `config.def.h`, and every install path builds it.
+- `master` only mirrors the official upstream dwm, `https://git.suckless.org/dwm`. Nothing of this fork lands on it.
+
+## Install
+
+This fork has two install paths. Pick the one that fits the host.
+
+### The operator's hosts: nix-secrets
+
+Use this path on a host that the operator's nix-secrets repository manages. That repository builds this fork through Home Manager on every such host.
+
+- `home/apps/dwm/flake.nix` in nix-secrets pins the `rice` branch of this repository.
+- nix-secrets builds the pinned source with the `dwm` package of nixpkgs, and installs the binary into the Home Manager profile.
+- A change of `rice` reaches a host in three steps: push `rice`, advance the pin in nix-secrets with `just update-pins`, and activate Home Manager. Then restart dwm.
+
+Do not run `./build_install.sh` on such a host. Its binary goes to `/usr/local/bin`, and the session does not run it, because the Home Manager profile comes first on `PATH`.
+
+### Another host: build_install.sh
+
+Use this path on a host without the nix-secrets setup:
+
+```sh
+./build_install.sh
+```
+
+The script builds with `/usr/bin/cc`, the C compiler of the host, and installs to `PREFIX` (`/usr/local`) with `sudo make install`. It names `/usr/bin/cc` because a Nix compiler first on `PATH` does not search `/usr/include`. The host needs these:
+
+- A C compiler at `/usr/bin/cc`, and `make`.
+- The development headers of X11, Xinerama, Xft, and fontconfig.
+- `pkg-config` at `/usr/bin/pkg-config`, which is optional. Without it, `config.mk` uses its fixed include and library paths.
+
+### Which binary runs
+
+The two paths install different binaries: the Home Manager profile holds one, and `/usr/local/bin/dwm` holds the other. The session runs the binary that its startup file names. A startup file that runs `dwm` by its bare name gets the first `dwm` on `PATH`. To see which binary that is, run `command -v dwm` in the session.
+
 ## Dev Shell and Hooks
 
 `flake.nix` holds the dev shell: `pre-commit`, `make`, the compiler, `pkg-config`, and the X11 and font libraries. `.envrc` loads it with direnv. Run the hooks in it:
@@ -10,11 +47,11 @@ nix develop --command pre-commit run --all-files
 nix develop --command pre-commit run --all-files --hook-stage pre-push
 ```
 
-The pre-push stage adds `gitleaks` and a `make clean && make` build in the dev shell. `./build_install.sh` builds on the host and installs the window manager of the host with `sudo make install`.
+The pre-push stage adds `gitleaks` and a `make clean && make` build in the dev shell. The dev shell is for development. It does not install dwm, see "Install".
 
 ## Git Workflow
 
-This repository uses master everywhere: local, origin, and upstream.
+The upstream mirror is `master` everywhere: local, origin, and upstream. The fork's work is on `rice`, see "Branches".
 
 Remote setup:
 
