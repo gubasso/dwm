@@ -80,6 +80,8 @@ repos:
         pass_filenames: false
         stages: [pre-push]
 
+  # make-build runs in the dev shell of flake.nix, which supplies make, the
+  # compiler, pkg-config, and the X11 and font libraries.
   - repo: local
     hooks:
       - id: make-build

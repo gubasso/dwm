@@ -22,8 +22,13 @@ FREETYPEINC = /usr/include/freetype2
 #MANPREFIX = ${PREFIX}/man
 
 # includes and libs
-INCS = -I${X11INC} -I${FREETYPEINC}
-LIBS = -L${X11LIB} -lX11 ${XINERAMALIBS} ${FREETYPELIBS} -lXrender
+# pkg-config gives the flags when it finds every package of PKGS, as in the
+# dev shell of flake.nix. Otherwise the fixed paths above apply. If you drop
+# Xinerama above, drop xinerama from PKGS too.
+PKG_CONFIG = pkg-config
+PKGS = x11 xinerama xft xrender fontconfig
+INCS != ${PKG_CONFIG} --cflags ${PKGS} 2>/dev/null || echo "-I${X11INC} -I${FREETYPEINC}"
+LIBS != ${PKG_CONFIG} --libs ${PKGS} 2>/dev/null || echo "-L${X11LIB} -lX11 ${XINERAMALIBS} ${FREETYPELIBS} -lXrender"
 
 # flags
 CPPFLAGS = -D_DEFAULT_SOURCE -D_BSD_SOURCE -D_XOPEN_SOURCE=700L -DVERSION=\"${VERSION}\" ${XINERAMAFLAGS}
