@@ -1,3 +1,4 @@
+/* See LICENSE file for copyright and license details. */
 /* cc transient.c -o transient -lX11 */
 
 #include <stdlib.h>
