@@ -14,7 +14,16 @@ make clean        # Remove compiled objects and binary
 sudo make install # Install to /usr/local/bin and man page to /usr/local/share/man
 ```
 
-There are no tests or linter. The project compiles with `-std=c99 -pedantic -Wall -Os`.
+The project compiles with `-std=c99 -pedantic -Wall -Os`. There are no tests. The git hooks lint and format the C code.
+
+Run the hooks in the dev shell of `flake.nix`, which supplies `pre-commit`, `make`, the compiler, `pkg-config`, and the X11 and font libraries:
+
+```sh
+nix develop --command pre-commit run --all-files                         # pre-commit stage
+nix develop --command pre-commit run --all-files --hook-stage pre-push   # adds gitleaks and make-build
+```
+
+`build_install.sh` builds on the host and installs with `sudo make install`, because it installs the window manager of the host. `config.mk` takes the include and library flags from `pkg-config`, and falls back to fixed host paths when `pkg-config` does not find the libraries.
 
 ## Configuration Workflow
 

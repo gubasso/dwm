@@ -1,5 +1,17 @@
 # dwm Custom Notes
 
+## Dev Shell and Hooks
+
+`flake.nix` holds the dev shell: `pre-commit`, `make`, the compiler, `pkg-config`, and the X11 and font libraries. `.envrc` loads it with direnv. Run the hooks in it:
+
+```sh
+nix develop --command pre-commit install
+nix develop --command pre-commit run --all-files
+nix develop --command pre-commit run --all-files --hook-stage pre-push
+```
+
+The pre-push stage adds `gitleaks` and a `make clean && make` build in the dev shell. `./build_install.sh` builds on the host and installs the window manager of the host with `sudo make install`.
+
 ## Git Workflow
 
 This repository uses master everywhere: local, origin, and upstream.

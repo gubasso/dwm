@@ -14,6 +14,9 @@ There is no `src/` or `tests/` directory; keep additions at repo root unless a n
 - `make install`: install binary and man page (respects `PREFIX`/`DESTDIR`; may require root).
 - `make uninstall`: remove installed files.
 - `make clean install`: upstream-recommended full build+install flow.
+- `nix develop --command pre-commit run --all-files`: run the pre-commit hooks in the dev shell of `flake.nix`. `.envrc` loads the same shell with direnv.
+- `nix develop --command pre-commit run --all-files --hook-stage pre-push`: run the pre-push hooks, which add `gitleaks` and the `make-build` hook. `make-build` runs `make clean && make` with the compiler and the libraries of the dev shell.
+- `./build_install.sh`: build on the host and install with `sudo make install`. It runs outside the dev shell, because it installs the window manager of the host.
 
 ## Coding Style & Naming Conventions
 - Follow existing C99 toolchain settings from `config.mk` (`-std=c99 -pedantic -Wall`).
