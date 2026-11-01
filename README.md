@@ -11,13 +11,15 @@ This fork has two install paths. Pick the one that fits the host.
 
 ### The operator's hosts: nix-secrets
 
-Use this path on a host that the operator's nix-secrets repository manages. That repository builds this fork through Home Manager on every such host.
+Use this path on a host that the operator's nix-secrets repository manages. That repository builds this fork on every such host.
 
 - `home/apps/dwm/flake.nix` in nix-secrets pins the `rice` branch of this repository.
-- nix-secrets builds the pinned source with the `dwm` package of nixpkgs, and installs the binary into the Home Manager profile.
-- A change of `rice` reaches a host in three steps: push `rice`, advance the pin in nix-secrets with `just update-pins`, and activate Home Manager. Then restart dwm.
+- nix-secrets builds the pinned source with the `dwm` package of nixpkgs.
+- A standalone Home Manager host, such as tumblesuse, installs the binary into the Home Manager profile.
+- A NixOS host, such as orion or lyra, installs the binary as a system package.
+- A change of `rice` reaches a host in four steps: push `rice`, advance the pin in nix-secrets with `just update-pins`, and activate the host with `just sync` in nix-secrets. Then restart dwm. `just sync` runs `home-manager switch` on a standalone host and `nixos-rebuild switch` on NixOS.
 
-Do not run `./build_install.sh` on such a host. Its binary goes to `/usr/local/bin`, and the session does not run it, because the Home Manager profile comes first on `PATH`.
+Do not run `./build_install.sh` on such a host. Its binary goes to `/usr/local/bin`, and the session does not run it, because the nix-secrets binary comes first on `PATH`.
 
 ### Another host: build_install.sh
 
@@ -35,7 +37,7 @@ The script builds with `/usr/bin/cc`, the C compiler of the host, and installs t
 
 ### Which binary runs
 
-The two paths install different binaries: the Home Manager profile holds one, and `/usr/local/bin/dwm` holds the other. The session runs the binary that its startup file names. A startup file that runs `dwm` by its bare name gets the first `dwm` on `PATH`. To see which binary that is, run `command -v dwm` in the session.
+The two paths install different binaries. The nix-secrets binary is in the Home Manager profile or the NixOS system profile, and the binary of `build_install.sh` is `/usr/local/bin/dwm`. The session runs the binary that its startup file names. A startup file that runs `dwm` by its bare name gets the first `dwm` on `PATH`. To see which binary that is, run `command -v dwm` in the session.
 
 ## Dev Shell and Hooks
 
