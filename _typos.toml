@@ -1,2 +1,8 @@
 [default.extend-identifiers]
 boxs = "boxs"
+
+# nix writes flake.lock. A generated file follows its generator, so typos
+# skips it (the dev environment rule of nix-secrets). The hook passes
+# --force-exclude, so this list also holds there.
+[files]
+extend-exclude = ["flake.lock"]

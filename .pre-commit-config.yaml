@@ -5,11 +5,16 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
+      # The two fixers skip the flake.lock that nix writes. A generated file
+      # follows its generator, so no hook rewrites it: the dev environment rule
+      # of nix-secrets, home/apps/claude-session/rules/dev-environment.md.
+      # typos and editorconfig-checker skip it in _typos.toml and
+      # .editorconfig-checker.json, so a direct run of either tool agrees.
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
-        exclude: '\.(diff|patch)$'
+        exclude: '\.(diff|patch)$|^flake\.lock$'
       - id: end-of-file-fixer
-        exclude: '\.(diff|patch)$'
+        exclude: '\.(diff|patch)$|^flake\.lock$'
       - id: check-added-large-files
         args: ['--maxkb=16384']
       - id: check-case-conflict
