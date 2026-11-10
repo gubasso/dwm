@@ -89,9 +89,19 @@ repos:
   # compiler, pkg-config, and the X11 and font libraries.
   - repo: local
     hooks:
+      # owner: devshell (no-hook-language) make and the C toolchain have no hook in a language that pre-commit builds.
       - id: make-build
         name: make clean && make
         entry: bash -c 'make clean && make'
         language: system
         pass_filenames: false
         stages: [pre-push]
+
+  # --- Dependency owners ---
+  - repo: local
+    hooks:
+      - id: no-language-library-in-flake
+        name: a flake holds no language library
+        language: pygrep
+        entry: '^(?!\s*#).*(withPackages|python3[0-9]*Packages\.|pythonPackages\.|nodePackages\.|perlPackages\.)'
+        files: '(^|/)flake\.nix$|(^|/)nix/.*\.nix$'
