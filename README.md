@@ -49,7 +49,7 @@ nix develop --command pre-commit run --all-files
 nix develop --command pre-commit run --all-files --hook-stage pre-push
 ```
 
-The pre-push stage adds `gitleaks` and a `make clean && make` build in the dev shell. The dev shell is for development. It does not install dwm, see "Install".
+The pre-push stage runs only `gitleaks` and a `make clean && make` build in the dev shell. Every other hook runs at pre-commit alone. The dev shell is for development. It does not install dwm, see "Install".
 
 ## Git Workflow
 

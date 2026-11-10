@@ -20,7 +20,7 @@ Run the hooks in the dev shell of `flake.nix`, which supplies `pre-commit`, `mak
 
 ```sh
 nix develop --command pre-commit run --all-files                         # pre-commit stage
-nix develop --command pre-commit run --all-files --hook-stage pre-push   # adds gitleaks and make-build
+nix develop --command pre-commit run --all-files --hook-stage pre-push   # gitleaks and make-build only
 ```
 
 dwm has two install paths, described in "Install" of `README.md`. On the operator's hosts, nix-secrets builds the pinned `rice`, through Home Manager on a standalone host and as a system package on NixOS. On another host, `build_install.sh` builds with `/usr/bin/cc` and installs with `sudo make install`. `config.mk` takes the include and library flags from `pkg-config`, and falls back to fixed host paths when `pkg-config` does not find the libraries.
