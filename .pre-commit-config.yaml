@@ -1,5 +1,12 @@
 default_install_hook_types: [pre-commit, pre-push]
 
+# Each check runs in exactly one stage. A hook with no `stages` runs only at
+# pre-commit. An upstream manifest that names its own `stages` wins over this
+# default, so each such hook below sets `stages: [pre-commit]`. The pre-push
+# stage runs only the costly checks, gitleaks and make-build, because a pushed
+# commit already passed the pre-commit stage.
+default_stages: [pre-commit]
+
 repos:
   # --- Housekeeping (auto-fix where possible) ---
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -11,21 +18,26 @@ repos:
       # typos and editorconfig-checker skip it in _typos.toml and
       # .editorconfig-checker.json, so a direct run of either tool agrees.
       - id: trailing-whitespace
+        stages: [pre-commit]
         args: [--markdown-linebreak-ext=md]
         exclude: '\.(diff|patch)$|^flake\.lock$'
       - id: end-of-file-fixer
+        stages: [pre-commit]
         exclude: '\.(diff|patch)$|^flake\.lock$'
       - id: check-added-large-files
+        stages: [pre-commit]
         args: ['--maxkb=16384']
       - id: check-case-conflict
       - id: check-merge-conflict
         args: ['--assume-in-merge']
       - id: check-shebang-scripts-are-executable
+        stages: [pre-commit]
       - id: check-symlinks
       - id: check-toml
       - id: check-yaml
       - id: check-xml
       - id: destroyed-symlinks
+        stages: [pre-commit]
       - id: detect-private-key
       - id: pretty-format-json
         args: ["--autofix", "--no-ensure-ascii", "--no-sort-keys", "--indent=2"]
@@ -69,6 +81,7 @@ repos:
     rev: v1.43.5
     hooks:
       - id: typos
+        stages: [pre-commit]
 
   # --- Secret scanning (pre-commit, fast) ---
   - repo: https://github.com/sirwart/ripsecrets
