@@ -4,12 +4,19 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
+    # The store guard of the canon (exobrain): `exobrain store-guard --daily`
+    # in .envrc warns about working-tree copies in the Nix store.
+    exobrain-tech = {
+      url = "github:gubasso/exobrain-tech/v1.0.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
     {
       nixpkgs,
       flake-utils,
+      exobrain-tech,
       ...
     }:
     flake-utils.lib.eachDefaultSystem (
@@ -36,6 +43,10 @@
             pkgs.libxrender
             pkgs.fontconfig
             pkgs.freetype
+          ]
+          # exobrain, the store guard that .envrc runs once a day.
+          ++ pkgs.lib.optionals (system == "x86_64-linux") [
+            exobrain-tech.packages.${system}.default
           ];
         };
       }
