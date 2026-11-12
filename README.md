@@ -41,12 +41,12 @@ The two paths install different binaries. The nix-secrets binary is in the Home 
 
 ## Dev Shell and Hooks
 
-`flake.nix` holds the dev shell: `pre-commit`, `make`, the compiler, `pkg-config`, and the X11 and font libraries. `.envrc` loads it with direnv. Run the hooks in it:
+`flake.nix` holds the dev shell: `make`, the compiler, `pkg-config`, and the X11 and font libraries. `.envrc` loads it with direnv. [`host-requirements.toml`](./host-requirements.toml) lists the tools that the host supplies. Run the hooks in the dev shell:
 
 ```sh
-nix develop --command pre-commit install
-nix develop --command pre-commit run --all-files
-nix develop --command pre-commit run --all-files --hook-stage pre-push
+nix develop --command prek install
+nix develop --command prek run --all-files
+nix develop --command prek run --all-files --hook-stage pre-push
 ```
 
 The pre-push stage runs only `gitleaks` and a `make clean && make` build in the dev shell. Every other hook runs at pre-commit alone. The dev shell is for development. It does not install dwm, see "Install".

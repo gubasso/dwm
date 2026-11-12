@@ -1,0 +1,17 @@
+# The host tools of dwm's dev environment
+# (project-platform:host-requirements-list-the-host-tools). dwm's only
+# callers are its git hooks, and no recipe or script runs a check, so every
+# entry is presence-only. prek owns its version through minimum_prek_version
+# in .pre-commit-config.yaml.
+schema = 1
+
+[tools.git]
+
+[tools.prek]
+version = "*"
+
+[tools.nix]
+
+[tools.direnv]
+
+[tools.bash]

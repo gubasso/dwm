@@ -16,11 +16,11 @@ sudo make install # Install to /usr/local/bin and man page to /usr/local/share/m
 
 The project compiles with `-std=c99 -pedantic -Wall -Os`. There are no tests. The git hooks lint and format the C code.
 
-Run the hooks in the dev shell of `flake.nix`, which supplies `pre-commit`, `make`, the compiler, `pkg-config`, and the X11 and font libraries:
+Run the hooks in the dev shell of `flake.nix`, which supplies `make`, the compiler, `pkg-config`, and the X11 and font libraries. The host supplies the hook runner `prek`:
 
 ```sh
-nix develop --command pre-commit run --all-files                         # pre-commit stage
-nix develop --command pre-commit run --all-files --hook-stage pre-push   # gitleaks and make-build only
+nix develop --command prek run --all-files                         # pre-commit stage
+nix develop --command prek run --all-files --hook-stage pre-push   # gitleaks and make-build only
 ```
 
 dwm has two install paths, described in "Install" of `README.md`. On the operator's hosts, nix-secrets builds the pinned `rice`, through Home Manager on a standalone host and as a system package on NixOS. On another host, `build_install.sh` builds with `/usr/bin/cc` and installs with `sudo make install`. `config.mk` takes the include and library flags from `pkg-config`, and falls back to fixed host paths when `pkg-config` does not find the libraries.

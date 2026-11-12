@@ -14,8 +14,8 @@ There is no `src/` or `tests/` directory; keep additions at repo root unless a n
 - `make install`: install binary and man page (respects `PREFIX`/`DESTDIR`; may require root).
 - `make uninstall`: remove installed files.
 - `make clean install`: upstream-recommended full build+install flow.
-- `nix develop --command pre-commit run --all-files`: run the pre-commit hooks in the dev shell of `flake.nix`. `.envrc` loads the same shell with direnv.
-- `nix develop --command pre-commit run --all-files --hook-stage pre-push`: run the pre-push hooks, `gitleaks` and the `make-build` hook. Every other hook runs only at pre-commit, so the pre-push stage repeats none of it. `make-build` runs `make clean && make` with the compiler and the libraries of the dev shell.
+- `nix develop --command prek run --all-files`: run the pre-commit hooks in the dev shell of `flake.nix`. `.envrc` loads the same shell with direnv. The host supplies `prek`.
+- `nix develop --command prek run --all-files --hook-stage pre-push`: run the pre-push hooks, `gitleaks` and the `make-build` hook. Every other hook runs only at pre-commit, so the pre-push stage repeats none of it. `make-build` runs `make clean && make` with the compiler and the libraries of the dev shell.
 - Install on the operator's hosts: nix-secrets pins `rice` in `home/apps/dwm/flake.nix` and builds it, into the Home Manager profile on a standalone host and into the system packages on NixOS. A change reaches a host after `just update-pins` and `just sync` in nix-secrets.
 - Install on another host: `./build_install.sh` builds with `/usr/bin/cc` and the host headers, outside the dev shell, and installs to `/usr/local` with `sudo make install`. See "Install" in `README.md`.
 

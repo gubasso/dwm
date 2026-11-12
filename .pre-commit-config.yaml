@@ -1,3 +1,7 @@
+# The host supplies the hook runner prek, and this is the oldest prek the
+# configuration accepts
+# (https://prek.j178.dev/reference/configuration/#minimum_prek_version).
+minimum_prek_version: "0.5.7"
 default_install_hook_types: [pre-commit, pre-push]
 
 # Each check runs in exactly one stage. A hook with no `stages` runs only at
@@ -102,7 +106,7 @@ repos:
   # compiler, pkg-config, and the X11 and font libraries.
   - repo: local
     hooks:
-      # owner: devshell (no-hook-language) make and the C toolchain have no hook in a language that pre-commit builds.
+      # owner: devshell (no-hook-language) make and the C toolchain have no hook in a language that the hook runner builds.
       - id: make-build
         name: make clean && make
         entry: bash -c 'make clean && make'
@@ -120,9 +124,14 @@ repos:
         files: '(^|/)flake\.nix$|(^|/)nix/.*\.nix$'
         stages: [pre-commit]
 
-  # A flake reference reads the git tree of a checkout, never a path copy of
-  # the whole folder into the Nix store. The hook is published by exobrain-tech.
+  # The hooks that exobrain-tech publishes. A flake reference reads the git
+  # tree of a checkout, never a path copy of the whole folder into the Nix
+  # store. A flake holds no git hook runner, because the host supplies prek.
+  # host-requirements.toml parses each time it changes; the hook runs the
+  # exobrain of the devshell.
   - repo: https://github.com/gubasso/exobrain-tech
-    rev: v1.0.0
+    rev: v1.1.0
     hooks:
       - id: no-path-flake-reference
+      - id: no-hook-runner-in-flake
+      - id: host-requirements

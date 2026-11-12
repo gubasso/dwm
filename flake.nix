@@ -1,5 +1,5 @@
 {
-  description = "dwm dev shell: pre-commit and the build of the make-build hook";
+  description = "dwm dev shell: the build of the make-build hook";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -7,7 +7,7 @@
     # The store guard of the canon (exobrain): `exobrain store-guard --daily`
     # in .envrc warns about working-tree copies in the Nix store.
     exobrain-tech = {
-      url = "github:gubasso/exobrain-tech/v1.0.0";
+      url = "github:gubasso/exobrain-tech/v1.1.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -31,10 +31,6 @@
         # host build, because it installs the window manager of the host.
         devShells.default = pkgs.mkShell {
           packages = [
-            pkgs.pre-commit
-            # rustup needs curl when pre-commit sets up the environment of
-            # the ripsecrets hook. pre-commit installs rust itself.
-            pkgs.curl
             pkgs.gnumake
             pkgs.pkg-config
             pkgs.libx11

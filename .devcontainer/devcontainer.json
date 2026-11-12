@@ -10,6 +10,6 @@
     },
   ],
   "postCreateCommand": {
-    "pre-commit": "pre-commit install"
+    "prek": "prek install"
   }
 }
